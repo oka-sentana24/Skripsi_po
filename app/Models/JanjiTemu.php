@@ -20,4 +20,10 @@ class JanjiTemu extends Model
     {
         return $this->belongsTo(Terapis::class);
     }
+
+   public function jenisLayanans()
+    {
+        return $this->belongsToMany(JenisLayanan::class, 'janji_temu_layanan');
+    }
+
 }

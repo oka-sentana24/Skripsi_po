@@ -13,7 +13,11 @@ class ListPasiens extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            Actions\CreateAction::make(),
+            Actions\CreateAction::make()
+            ->label('Tambah Pasien')
+                ->icon('heroicon-o-user-plus')
+                ->color('primary')
+                ->tooltip('Tambah Pasien Baru'),
         ];
     }
 }

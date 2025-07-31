@@ -6,9 +6,14 @@ use App\Filament\Resources\AntreanResource\Pages;
 use App\Filament\Resources\AntreanResource\RelationManagers;
 use App\Models\Antrean;
 use Filament\Forms;
+use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
+use Filament\Tables\Columns\BadgeColumn;
+use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
@@ -19,11 +24,38 @@ class AntreanResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
+    protected static ?string $navigationGroup = 'Manajemen Antrean';
+    protected static ?string $modelLabel = 'Antrean';
+    protected static ?string $pluralModelLabel = 'Daftar Antrean';
+
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
-                //
+                Select::make('pasien_id')
+                ->relationship('pasien', 'nama')
+                ->searchable()
+                ->required()
+                ->label('Pasien'),
+
+                TextInput::make('nomor_antrean')
+                    ->required()
+                    ->numeric()
+                    ->label('Nomor Antrean'),
+
+                DatePicker::make('tanggal_antrean')
+                    ->required()
+                    ->label('Tanggal Antrean'),
+
+                Select::make('status')
+                    ->required()
+                    ->options([
+                        'menunggu' => 'Menunggu',
+                        'dilayani' => 'Dilayani',
+                        'selesai' => 'Selesai',
+                        'batal' => 'Batal',
+                    ])
+                    ->label('Status'),
             ]);
     }
 
@@ -31,7 +63,29 @@ class AntreanResource extends Resource
     {
         return $table
             ->columns([
-                //
+            TextColumn::make('pasien.nama')
+                ->searchable()
+                ->sortable()
+                ->label('Nama Pasien'),
+
+            TextColumn::make('nomor_antrean')
+                ->sortable()
+                ->label('No. Antrean'),
+
+            TextColumn::make('tanggal_antrean')
+                ->date()
+                ->sortable()
+                ->label('Tanggal'),
+
+            BadgeColumn::make('status')
+                ->sortable()
+                ->colors([
+                    'warning' => 'menunggu',
+                    'info' => 'dilayani',
+                    'success' => 'selesai',
+                    'danger' => 'batal',
+                ])
+                ->label('Status'),
             ])
             ->filters([
                 //

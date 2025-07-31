@@ -16,7 +16,6 @@ return new class extends Migration
             $table->foreignId('pasien_id')->constrained()->onDelete('cascade');
             $table->date('tanggal_janji');
             $table->time('jam_janji');
-            $table->string('layanan')->nullable();
             $table->foreignId('terapis_id')->nullable()->constrained()->onDelete('set null');
             $table->timestamps();
         });

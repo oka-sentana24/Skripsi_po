@@ -25,6 +25,12 @@ class DatabaseSeeder extends Seeder
             TerapisSeeder::class,
             ProdukSeeder::class,
             JenisLayananSeeder::class,
+            JanjiTemuSeeder::class,
+            AntreanSeeder::class,
+            PendaftaranSeeder::class,
+            TindakanSeeder::class,
+            PenjualanProdukSeeder::class,
+            PembayaranSeeder::class,
         ]);
     }
 }

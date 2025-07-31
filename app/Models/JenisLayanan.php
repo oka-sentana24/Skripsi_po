@@ -15,4 +15,9 @@ class JenisLayanan extends Model
         'durasi',
         'deskripsi',
     ];
+
+    public function janjiTemus()
+    {
+        return $this->belongsToMany(JanjiTemu::class, 'janji_temu_layanan');
+    }
 }

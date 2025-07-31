@@ -18,12 +18,35 @@ class TindakanResource extends Resource
     protected static ?string $model = Tindakan::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationGroup = 'Manajemen Tindakan';
+    protected static ?string $modelLabel = 'Tindakan';
+    protected static ?string $pluralModelLabel = 'Daftar Tindakan';
 
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
-                //
+                Forms\Components\Select::make('pendaftaran_id')
+                ->label('Pendaftaran')
+                ->relationship('pendaftaran', 'id')
+                ->searchable()
+                ->required(),
+
+            Forms\Components\Select::make('terapis_id')
+                ->label('Terapis')
+                ->relationship('terapis', 'nama')
+                ->searchable()
+                ->required(),
+
+            Forms\Components\Select::make('layanan_id')
+                ->label('Jenis Layanan')
+                ->relationship('layanan', 'nama')
+                ->searchable()
+                ->required(),
+
+            Forms\Components\Textarea::make('catatan')
+                ->label('Catatan')
+                ->nullable(),
             ]);
     }
 
@@ -31,7 +54,29 @@ class TindakanResource extends Resource
     {
         return $table
             ->columns([
-                //
+                Tables\Columns\TextColumn::make('pendaftaran.id')
+                ->label('ID Pendaftaran')
+                ->sortable()
+                ->searchable(),
+
+            Tables\Columns\TextColumn::make('terapis.nama')
+                ->label('Terapis')
+                ->sortable()
+                ->searchable(),
+
+            Tables\Columns\TextColumn::make('layanan.nama')
+                ->label('Jenis Layanan')
+                ->sortable()
+                ->searchable(),
+
+            Tables\Columns\TextColumn::make('catatan')
+                ->label('Catatan')
+                ->limit(30)
+                ->wrap(),
+
+            Tables\Columns\TextColumn::make('created_at')
+                ->label('Dibuat')
+                ->dateTime('d M Y H:i'),
             ])
             ->filters([
                 //

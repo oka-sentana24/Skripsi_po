@@ -17,10 +17,10 @@ class TerapisResource extends Resource
 {
     protected static ?string $model = Terapis::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-o-user-group';
      protected static ?string $navigationGroup = 'Master Data';
     protected static ?string $modelLabel = 'Terapis';
-    protected static ?string $pluralModelLabel = 'Daftar Terapis';
+    protected static ?string $pluralModelLabel = 'Terapis';
 
     public static function form(Form $form): Form
     {
@@ -79,8 +79,8 @@ class TerapisResource extends Resource
     {
         return [
             'index' => Pages\ListTerapis::route('/'),
-            'create' => Pages\CreateTerapis::route('/create'),
-            'edit' => Pages\EditTerapis::route('/{record}/edit'),
+            // 'create' => Pages\CreateTerapis::route('/create'),
+            // 'edit' => Pages\EditTerapis::route('/{record}/edit'),
         ];
     }
 }

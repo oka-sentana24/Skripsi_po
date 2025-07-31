@@ -125,8 +125,8 @@ class PasienResource extends Resource
     {
         return [
             'index' => Pages\ListPasiens::route('/'),
-            'create' => Pages\CreatePasien::route('/create'),
-            'edit' => Pages\EditPasien::route('/{record}/edit'),
+            // 'create' => Pages\CreatePasien::route('/create'),
+            // 'edit' => Pages\EditPasien::route('/{record}/edit'),
         ];
     }
 }

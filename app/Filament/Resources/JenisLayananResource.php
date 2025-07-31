@@ -20,8 +20,8 @@ class JenisLayananResource extends Resource
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
     protected static ?string $navigationGroup = 'Master Data';
-    protected static ?string $modelLabel = 'Jenis Layanan';
-    protected static ?string $pluralModelLabel = 'Daftar Jenis Layanan';
+    protected static ?string $modelLabel = 'Layanan';
+    protected static ?string $pluralModelLabel = 'Layanan';
 
     public static function form(Form $form): Form
     {
@@ -82,8 +82,9 @@ class JenisLayananResource extends Resource
     {
         return [
             'index' => Pages\ListJenisLayanans::route('/'),
-            'create' => Pages\CreateJenisLayanan::route('/create'),
-            'edit' => Pages\EditJenisLayanan::route('/{record}/edit'),
+            // 'create' => Pages\CreateJenisLayanan::route('/create'),
+            // 'edit' => Pages\EditJenisLayanan::route('/{record}/edit'),
         ];
     }
+    
 }

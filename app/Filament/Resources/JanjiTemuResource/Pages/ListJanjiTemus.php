@@ -13,7 +13,11 @@ class ListJanjiTemus extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            Actions\CreateAction::make(),
+            Actions\CreateAction::make()
+            ->label('Tambah Janji Temu')
+                ->icon('heroicon-o-calendar')
+                ->color('primary')
+                ->tooltip('Tambah Janji Temu Baru'),
         ];
     }
 }

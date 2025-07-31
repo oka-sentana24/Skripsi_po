@@ -19,11 +19,25 @@ class PendaftaranResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
+    protected static ?string $navigationGroup = 'Manajemen Pendaftaran';
+    protected static ?string $modelLabel = 'Pendaftaran';
+    protected static ?string $pluralModelLabel = 'Daftar Pendaftaran';
+
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
-                //
+                Forms\Components\Select::make('antrean_id')
+                    ->label('Antrean')
+                    ->relationship('antrean', 'nomor_antrean')
+                    ->searchable()
+                    ->required(),
+                Forms\Components\DatePicker::make('tanggal_pendaftaran')
+                    ->label('Tanggal Pendaftaran')
+                    ->required(),
+                Forms\Components\Textarea::make('catatan')
+                    ->label('Catatan')
+                    ->rows(3),
             ]);
     }
 
@@ -31,7 +45,19 @@ class PendaftaranResource extends Resource
     {
         return $table
             ->columns([
-                //
+                Tables\Columns\TextColumn::make('antrean.nomor_antrean')
+                    ->label('Nomor Antrean')
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('tanggal_pendaftaran')
+                    ->label('Tanggal')
+                    ->date()
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('catatan')
+                    ->label('Catatan')
+                    ->limit(50),
+                Tables\Columns\TextColumn::make('created_at')
+                    ->label('Dibuat')
+                    ->since(),
             ])
             ->filters([
                 //

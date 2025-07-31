@@ -26,8 +26,8 @@ class Tindakan extends Model
         return $this->belongsTo(Terapis::class);
     }
 
-    public function jenisLayanan()
+    public function layanan()
     {
-        return $this->belongsTo(JenisLayanan::class);
+        return $this->belongsTo(JenisLayanan::class, 'layanan_id'); // Jika kamu pakai 'layanan_id'
     }
 }
