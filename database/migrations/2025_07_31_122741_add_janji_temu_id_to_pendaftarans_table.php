@@ -11,12 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('pendaftarans', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('antrean_id')->nullable()->constrained()->onDelete('cascade');
-            $table->date('tanggal_pendaftaran');
-            $table->text('catatan')->nullable();
-            $table->timestamps();
+        Schema::table('pendaftarans', function (Blueprint $table) {
+            $table->foreignId('janji_temu_id')->nullable()->constrained()->onDelete('set null');
         });
     }
 
@@ -25,6 +21,9 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('pendaftarans');
+        Schema::table('pendaftarans', function (Blueprint $table) {
+            $table->dropForeign(['janji_temu_id']);
+            $table->dropColumn('janji_temu_id');
+        });
     }
 };

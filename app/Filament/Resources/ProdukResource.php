@@ -24,32 +24,32 @@ class ProdukResource extends Resource
 
     protected static ?string $navigationGroup = 'Master Data';
     protected static ?string $modelLabel = 'Produk';
-    protected static ?string $pluralModelLabel = 'Produk';
+    protected static ?string $pluralModelLabel = 'Data Produk';
 
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
                 TextInput::make('nama')
-                ->label('Nama Produk')
-                ->required()
-                ->maxLength(100),
+                    ->label('Nama Produk')
+                    ->required()
+                    ->maxLength(100),
 
-            TextInput::make('harga')
-                ->label('Harga')
-                ->required()
-                ->numeric()
-                ->prefix('Rp'),
+                TextInput::make('harga')
+                    ->label('Harga')
+                    ->required()
+                    ->numeric()
+                    ->prefix('Rp'),
 
-            TextInput::make('stok')
-                ->label('Stok')
-                ->required()
-                ->numeric(),
+                TextInput::make('stok')
+                    ->label('Stok')
+                    ->required()
+                    ->numeric(),
 
-            Textarea::make('deskripsi')
-                ->label('Deskripsi')
-                ->rows(3)
-                ->maxLength(1000),
+                Textarea::make('deskripsi')
+                    ->label('Deskripsi')
+                    ->rows(3)
+                    ->maxLength(1000),
             ]);
     }
 
@@ -57,21 +57,21 @@ class ProdukResource extends Resource
     {
         return $table
             ->columns([
-            TextColumn::make('nama')
-                ->label('Nama')
-                ->searchable()
-                ->sortable(),
+                TextColumn::make('nama')
+                    ->label('Nama')
+                    ->searchable()
+                    ->sortable(),
 
-            TextColumn::make('harga')
-                ->label('Harga')
-                ->money('IDR', locale: 'id'),
+                TextColumn::make('harga')
+                    ->label('Harga')
+                    ->money('IDR', locale: 'id'),
 
-            TextColumn::make('stok')
-                ->label('Stok'),
+                TextColumn::make('stok')
+                    ->label('Stok'),
 
-            TextColumn::make('deskripsi')
-                ->label('Deskripsi')
-                ->limit(30),
+                TextColumn::make('deskripsi')
+                    ->label('Deskripsi')
+                    ->limit(30),
             ])
             ->filters([
                 //

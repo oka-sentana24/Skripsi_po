@@ -5,6 +5,7 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\PasienResource\Pages;
 use App\Filament\Resources\PasienResource\RelationManagers;
 use App\Models\Pasien;
+use Carbon\Carbon;
 use Filament\Actions\Action;
 use Filament\Forms;
 use Filament\Forms\Form;
@@ -18,11 +19,17 @@ class PasienResource extends Resource
 {
     protected static ?string $model = Pasien::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-o-user-group';
 
-    protected static ?string $navigationGroup = 'Manajemen Pasien';
-    protected static ?string $modelLabel = 'Pasien';
-    protected static ?string $pluralModelLabel = 'Daftar Pasien';
+    // protected static ?string $navigationGroup = 'Manajemen Pasien';
+
+    protected static ?string $pluralModelLabel = 'Pendaftaran Pasien';
+
+    public static function getNavigationSort(): ?int
+    {
+        return 1;
+    }
+
 
     public static function form(Form $form): Form
     {
@@ -36,7 +43,7 @@ class PasienResource extends Resource
                     ->default(fn() => Pasien::generateRekamMedikNumber()) // Generate otomatis
                     ->disabled()
                     ->dehydrated(),
-                    
+
                 Forms\Components\TextInput::make('nama')
                     ->label('Nama Lengkap')
                     ->required()
@@ -49,7 +56,9 @@ class PasienResource extends Resource
 
                 Forms\Components\DatePicker::make('tanggal_lahir')
                     ->label('Tanggal Lahir')
-                    ->required(),
+                    ->required()
+                    ->displayFormat('d/m/Y')
+                    ->native(false),
 
                 Forms\Components\TextInput::make('no_hp')
                     ->label('No. HP')
@@ -82,30 +91,30 @@ class PasienResource extends Resource
             ->actions([
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\Action::make('print_card')
-                // ->label('Cetak Kartu')
-                // ->icon('heroicon-o-printer')
-                // // ->url(fn ($record) => route('pasien.print-card', $record))
-                // ->view('livewire.kartu-pasien')
-                // ->openUrlInNewTab(),
-                ->label('Cetak Kartu')
-                ->icon('heroicon-o-printer')
-                ->modalHeading('Kartu Pasien')
-                ->modalWidth('lg')
-                ->modalContent(function ($record) {
-                    return view('livewire.livewire.kartu-pasien', ['pasien' => $record]);
-                })
-                ->modalActions([
-                    Action::make('close')
-                        ->label('Tutup')
-                        ->color('gray')
-                        ->close(),
-                    Action::make('print')
-                        ->label('Cetak Kartu')
-                        ->button() // buat tombol biasa
-                        ->color('primary')
-                        ->extraAttributes(['onclick' => 'window.print()']), // jalankan print browser
-                    
-                ]),
+                    // ->label('Cetak Kartu')
+                    // ->icon('heroicon-o-printer')
+                    // // ->url(fn ($record) => route('pasien.print-card', $record))
+                    // ->view('livewire.kartu-pasien')
+                    // ->openUrlInNewTab(),
+                    ->label('Cetak Kartu')
+                    ->icon('heroicon-o-printer')
+                    ->modalHeading('Kartu Pasien')
+                    ->modalWidth('lg')
+                    ->modalContent(function ($record) {
+                        return view('livewire.livewire.kartu-pasien', ['pasien' => $record]);
+                    })
+                    ->modalActions([
+                        Action::make('close')
+                            ->label('Tutup')
+                            ->color('gray')
+                            ->close(),
+                        Action::make('print')
+                            ->label('Cetak Kartu')
+                            ->button() // buat tombol biasa
+                            ->color('primary')
+                            ->extraAttributes(['onclick' => 'window.print()']), // jalankan print browser
+
+                    ]),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

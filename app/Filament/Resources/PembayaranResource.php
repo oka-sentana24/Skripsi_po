@@ -17,41 +17,46 @@ class PembayaranResource extends Resource
 {
     protected static ?string $model = Pembayaran::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-o-credit-card';
 
-    protected static ?string $navigationGroup = 'Manajemen Pembayaran';
-    protected static ?string $modelLabel = 'Pembayaran';
-    protected static ?string $pluralModelLabel = 'Daftar Pembayaran';
+    // protected static ?string $navigationGroup = 'Manajemen Pembayaran';
+    // protected static ?string $modelLabel = 'Pembayaran';
+    protected static ?string $pluralModelLabel = 'Pembayaran';
+
+    public static function getNavigationSort(): ?int
+    {
+        return 5;
+    }
 
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
-            Forms\Components\Select::make('pendaftaran_id')
-                ->relationship('pendaftaran', 'id')
-                ->label('Pendaftaran')
-                ->searchable()
-                ->required(),
+                Forms\Components\Select::make('pendaftaran_id')
+                    ->relationship('pendaftaran', 'id')
+                    ->label('Pendaftaran')
+                    ->searchable()
+                    ->required(),
 
-            Forms\Components\TextInput::make('total_layanan')
-                ->numeric()
-                ->prefix('Rp')
-                ->required(),
+                Forms\Components\TextInput::make('total_layanan')
+                    ->numeric()
+                    ->prefix('Rp')
+                    ->required(),
 
-            Forms\Components\TextInput::make('total_produk')
-                ->numeric()
-                ->prefix('Rp')
-                ->required(),
+                Forms\Components\TextInput::make('total_produk')
+                    ->numeric()
+                    ->prefix('Rp')
+                    ->required(),
 
-            Forms\Components\TextInput::make('diskon')
-                ->numeric()
-                ->prefix('Rp')
-                ->default(0),
+                Forms\Components\TextInput::make('diskon')
+                    ->numeric()
+                    ->prefix('Rp')
+                    ->default(0),
 
-            Forms\Components\TextInput::make('total_bayar')
-                ->numeric()
-                ->prefix('Rp')
-                ->required(),
+                Forms\Components\TextInput::make('total_bayar')
+                    ->numeric()
+                    ->prefix('Rp')
+                    ->required(),
             ]);
     }
 
@@ -59,24 +64,24 @@ class PembayaranResource extends Resource
     {
         return $table
             ->columns([
-            Tables\Columns\TextColumn::make('pendaftaran.id')
-                ->label('ID Pendaftaran'),
+                Tables\Columns\TextColumn::make('pendaftaran.id')
+                    ->label('ID Pendaftaran'),
 
-            Tables\Columns\TextColumn::make('total_layanan')
-                ->money('IDR'),
+                Tables\Columns\TextColumn::make('total_layanan')
+                    ->money('IDR'),
 
-            Tables\Columns\TextColumn::make('total_produk')
-                ->money('IDR'),
+                Tables\Columns\TextColumn::make('total_produk')
+                    ->money('IDR'),
 
-            Tables\Columns\TextColumn::make('diskon')
-                ->money('IDR'),
+                Tables\Columns\TextColumn::make('diskon')
+                    ->money('IDR'),
 
-            Tables\Columns\TextColumn::make('total_bayar')
-                ->money('IDR'),
+                Tables\Columns\TextColumn::make('total_bayar')
+                    ->money('IDR'),
 
-            Tables\Columns\TextColumn::make('created_at')
-                ->dateTime()
-                ->label('Dibuat pada'),
+                Tables\Columns\TextColumn::make('created_at')
+                    ->dateTime()
+                    ->label('Dibuat pada'),
             ])
             ->filters([
                 //

@@ -21,7 +21,7 @@ class PenjualanProdukResource extends Resource
 
     protected static ?string $navigationGroup = 'Master Data';
     protected static ?string $modelLabel = 'Penjualan Produk';
-    protected static ?string $pluralModelLabel = 'Daftar Penjualan Produk';
+    protected static ?string $pluralModelLabel = 'Riwayat Penjualan Produk';
 
     public static function form(Form $form): Form
     {

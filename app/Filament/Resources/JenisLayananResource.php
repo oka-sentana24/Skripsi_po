@@ -20,32 +20,32 @@ class JenisLayananResource extends Resource
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
     protected static ?string $navigationGroup = 'Master Data';
-    protected static ?string $modelLabel = 'Layanan';
-    protected static ?string $pluralModelLabel = 'Layanan';
+    // protected static ?string $modelLabel = 'Layanan';
+    protected static ?string $pluralModelLabel = 'Jenis Layanan';
 
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
                 Forms\Components\TextInput::make('nama')
-                ->required()
-                ->maxLength(255),
+                    ->required()
+                    ->maxLength(255),
 
-            Forms\Components\TextInput::make('harga')
-                ->label('Harga (Rp)')
-                ->numeric()
-                ->prefix('Rp')
-                ->required(),
+                Forms\Components\TextInput::make('harga')
+                    ->label('Harga (Rp)')
+                    ->numeric()
+                    ->prefix('Rp')
+                    ->required(),
 
-            Forms\Components\TextInput::make('durasi')
-                ->label('Durasi (menit)')
-                ->numeric()
-                ->nullable(),
+                Forms\Components\TextInput::make('durasi')
+                    ->label('Durasi (menit)')
+                    ->numeric()
+                    ->nullable(),
 
-            Forms\Components\Textarea::make('deskripsi')
-                ->label('Deskripsi')
-                ->rows(3)
-                ->nullable(),
+                Forms\Components\Textarea::make('deskripsi')
+                    ->label('Deskripsi')
+                    ->rows(3)
+                    ->nullable(),
             ]);
     }
 
@@ -53,10 +53,10 @@ class JenisLayananResource extends Resource
     {
         return $table
             ->columns([
-            Tables\Columns\TextColumn::make('nama')->sortable()->searchable(),
-            Tables\Columns\TextColumn::make('harga')->money('IDR', true),
-            Tables\Columns\TextColumn::make('durasi')->label('Durasi (menit)'),
-            Tables\Columns\TextColumn::make('deskripsi')->limit(30),
+                Tables\Columns\TextColumn::make('nama')->sortable()->searchable(),
+                Tables\Columns\TextColumn::make('harga')->money('IDR', true),
+                Tables\Columns\TextColumn::make('durasi')->label('Durasi (menit)'),
+                Tables\Columns\TextColumn::make('deskripsi')->limit(30),
             ])
             ->filters([
                 //
@@ -86,5 +86,4 @@ class JenisLayananResource extends Resource
             // 'edit' => Pages\EditJenisLayanan::route('/{record}/edit'),
         ];
     }
-    
 }

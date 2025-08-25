@@ -16,7 +16,7 @@ return new class extends Migration
             $table->foreignId('pasien_id')->constrained()->onDelete('cascade');
             $table->integer('nomor_antrean');
             $table->date('tanggal_antrean');
-            $table->enum('status', ['menunggu', 'dilayani', 'selesai', 'batal']);
+            $table->enum('status', ['menunggu', 'dipanggil', 'diperiksa', 'selesai', 'batal']);
             $table->timestamps();
         });
     }

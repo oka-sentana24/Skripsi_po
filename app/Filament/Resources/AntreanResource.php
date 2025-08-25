@@ -24,19 +24,19 @@ class AntreanResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
-    protected static ?string $navigationGroup = 'Manajemen Antrean';
+    protected static ?string $navigationGroup = 'Master Data';
     protected static ?string $modelLabel = 'Antrean';
-    protected static ?string $pluralModelLabel = 'Daftar Antrean';
+    protected static ?string $pluralModelLabel = 'Template Antrean';
 
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
                 Select::make('pasien_id')
-                ->relationship('pasien', 'nama')
-                ->searchable()
-                ->required()
-                ->label('Pasien'),
+                    ->relationship('pasien', 'nama')
+                    ->searchable()
+                    ->required()
+                    ->label('Pasien'),
 
                 TextInput::make('nomor_antrean')
                     ->required()
@@ -63,29 +63,29 @@ class AntreanResource extends Resource
     {
         return $table
             ->columns([
-            TextColumn::make('pasien.nama')
-                ->searchable()
-                ->sortable()
-                ->label('Nama Pasien'),
+                TextColumn::make('pasien.nama')
+                    ->searchable()
+                    ->sortable()
+                    ->label('Nama Pasien'),
 
-            TextColumn::make('nomor_antrean')
-                ->sortable()
-                ->label('No. Antrean'),
+                TextColumn::make('nomor_antrean')
+                    ->sortable()
+                    ->label('No. Antrean'),
 
-            TextColumn::make('tanggal_antrean')
-                ->date()
-                ->sortable()
-                ->label('Tanggal'),
+                TextColumn::make('tanggal_antrean')
+                    ->date()
+                    ->sortable()
+                    ->label('Tanggal'),
 
-            BadgeColumn::make('status')
-                ->sortable()
-                ->colors([
-                    'warning' => 'menunggu',
-                    'info' => 'dilayani',
-                    'success' => 'selesai',
-                    'danger' => 'batal',
-                ])
-                ->label('Status'),
+                BadgeColumn::make('status')
+                    ->sortable()
+                    ->colors([
+                        'warning' => 'menunggu',
+                        'info' => 'dilayani',
+                        'success' => 'selesai',
+                        'danger' => 'batal',
+                    ])
+                    ->label('Status'),
             ])
             ->filters([
                 //

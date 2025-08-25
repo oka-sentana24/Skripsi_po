@@ -11,7 +11,7 @@ class JenisLayananSeeder extends Seeder
     /**
      * Run the database seeds.
      */
-   public function run(): void
+    public function run(): void
     {
         $layanans = [
             [
@@ -68,5 +68,4 @@ class JenisLayananSeeder extends Seeder
             JenisLayanan::create($layanan);
         }
     }
-
 }

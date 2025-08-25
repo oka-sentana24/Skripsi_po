@@ -9,7 +9,7 @@ class Pendaftaran extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['antrean_id', 'tanggal_pendaftaran', 'catatan'];
+    protected $fillable = ['antrean_id', 'tanggal_pendaftaran', 'catatan', 'janji_temu_id', 'status'];
 
     public function antrean()
     {
@@ -29,5 +29,9 @@ class Pendaftaran extends Model
     public function pembayaran()
     {
         return $this->hasOne(Pembayaran::class);
+    }
+    public function janjiTemu()
+    {
+        return $this->belongsTo(JanjiTemu::class);
     }
 }

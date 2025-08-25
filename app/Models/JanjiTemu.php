@@ -9,7 +9,7 @@ class JanjiTemu extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['pasien_id', 'tanggal_janji', 'jam_janji', 'layanan', 'terapis_id'];
+    protected $fillable = ['pasien_id', 'tanggal_janji', 'jam_janji', 'layanan', 'terapis_id', 'status'];
 
     public function pasien()
     {
@@ -21,9 +21,13 @@ class JanjiTemu extends Model
         return $this->belongsTo(Terapis::class);
     }
 
-   public function jenisLayanans()
+    public function jenisLayanans()
     {
         return $this->belongsToMany(JenisLayanan::class, 'janji_temu_layanan');
     }
 
+    public function pendaftaran()
+    {
+        return $this->hasOne(Pendaftaran::class);
+    }
 }

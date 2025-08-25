@@ -14,8 +14,8 @@ class ListPasiens extends ListRecords
     {
         return [
             Actions\CreateAction::make()
-            ->label('Tambah Pasien')
-                ->icon('heroicon-o-user-plus')
+                ->label('Tambah Pasien Baru')
+                ->icon('heroicon-o-plus')
                 ->color('primary')
                 ->tooltip('Tambah Pasien Baru'),
         ];
