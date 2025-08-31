@@ -16,6 +16,7 @@ use Filament\Forms\Components\TimePicker;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
+use Filament\Tables\Filters\Filter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
@@ -132,7 +133,19 @@ class JanjiTemuResource extends Resource
                     ->formatStateUsing(fn(string $state) => ucfirst($state)),
             ])
             ->filters([
-                //
+                Filter::make('tanggal')
+                    ->form([
+                        Forms\Components\DatePicker::make('tanggal')
+                            ->label('Tanggal Janji')
+                            ->default(today()) // ✅ otomatis ambil tanggal hari ini
+                            ->required(),
+                    ])
+                    ->query(function (Builder $query, array $data): Builder {
+                        return $query->when(
+                            $data['tanggal'] ?? null,
+                            fn($q, $date) => $q->whereDate('tanggal_janji', Carbon::parse($date)->toDateString())
+                        );
+                    }),
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),

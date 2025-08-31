@@ -35,10 +35,26 @@ class PendaftaranResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\Select::make('antrean_id')
-                    ->label('Antrean')
-                    ->relationship('antrean', 'nomor_antrean')
+                Forms\Components\Select::make('pasien_id')
+                    ->label('Pasien')
                     ->searchable()
+                    ->getSearchResultsUsing(
+                        fn(string $query) =>
+                        \App\Models\Pasien::query()
+                            ->where('nama', 'like', "%{$query}%")
+                            ->orWhere('no_rm', 'like', "%{$query}%")
+                            ->limit(50)
+                            ->get()
+                            ->mapWithKeys(fn($pasien) => [
+                                $pasien->id => "{$pasien->no_rm} - {$pasien->nama}"
+                            ])
+                    )
+                    ->getOptionLabelUsing(
+                        fn($value): ?string =>
+                        optional(\App\Models\Pasien::find($value))->no_rm
+                            . ' - ' .
+                            optional(\App\Models\Pasien::find($value))->nama
+                    )
                     ->required(),
                 Forms\Components\DatePicker::make('tanggal_pendaftaran')
                     ->label('Tanggal Pendaftaran')
@@ -57,7 +73,7 @@ class PendaftaranResource extends Resource
                     ->label('Nomor Antrean')
                     ->formatStateUsing(fn($state) => $state ?? 'Belum diverifikasi')
                     ->sortable(),
-                Tables\Columns\TextColumn::make('janjiTemu.pasien.nama')
+                Tables\Columns\TextColumn::make('pasien.nama')
                     ->label('Pasien')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('tanggal_pendaftaran')
@@ -69,7 +85,7 @@ class PendaftaranResource extends Resource
                     ->limit(50),
 
                 Tables\Columns\TextColumn::make('status')
-                    ->label('Catatan')
+                    ->label('Status')
                     ->limit(50),
 
                 Tables\Columns\TextColumn::make('created_at')
@@ -91,12 +107,13 @@ class PendaftaranResource extends Resource
                     )
                     ->action(function ($record) {
                         // Buat antrean baru
-                        $lastNumber = Antrean::whereDate('created_at', now()->toDateString())->max('nomor_antrean') ?? 0;
+                        $lastNumber = Antrean::whereDate('tanggal_antrean', now()->toDateString())
+                            ->max('nomor_antrean') ?? 0;
                         $newAntrean = Antrean::create([
-                            'nomor_antrean' => $lastNumber + 1,
-                            'pasien_id' => $record->janjiTemu->pasien_id, // sesuaikan jika relasi beda
+                            'nomor_antrean'   => $lastNumber + 1,
+                            'pasien_id'       => $record->pasien_id,
                             'tanggal_antrean' => now()->toDateString(),
-                            'status' => 'menunggu',
+                            'status'          => 'menunggu',
                         ]);
 
                         // Update pendaftaran

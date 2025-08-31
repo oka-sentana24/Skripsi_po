@@ -15,7 +15,7 @@ class ConvertJanjiTemuToPendaftaran extends Command
 
     public function handle(): int
     {
-        $today = Carbon::today();
+        $today = Carbon::today('Asia/Jakarta');
 
         // Ambil janji temu yang sudah lewat dan belum punya pendaftaran
         $janjiTemus = JanjiTemu::whereDate('tanggal_janji', '<=', $today)
@@ -34,6 +34,7 @@ class ConvertJanjiTemuToPendaftaran extends Command
                 // Buat pendaftaran tanpa antrean
                 Pendaftaran::create([
                     'antrean_id' => null,
+                    'pasien_id' => $janjiTemu->pasien_id,
                     'tanggal_pendaftaran' => now(),
                     'catatan' => $janjiTemu->catatan ?? null,
                     'janji_temu_id' => $janjiTemu->id,
