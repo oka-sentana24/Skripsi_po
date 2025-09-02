@@ -20,4 +20,9 @@ class JenisLayanan extends Model
     {
         return $this->belongsToMany(JanjiTemu::class, 'janji_temu_layanan');
     }
+
+    public function layanans()
+    {
+        return $this->belongsToMany(JenisLayanan::class, 'tindakan_layanan');
+    }
 }

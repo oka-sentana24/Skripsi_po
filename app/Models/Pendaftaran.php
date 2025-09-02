@@ -40,4 +40,8 @@ class Pendaftaran extends Model
     {
         return $this->belongsTo(JanjiTemu::class);
     }
+    public function tindakans()
+    {
+        return $this->hasMany(Tindakan::class);
+    }
 }

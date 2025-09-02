@@ -3,23 +3,25 @@
 namespace App\Filament\Resources\PendaftaranResource\Widgets;
 
 use App\Models\Pendaftaran;
-use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Select;
+use Filament\Forms\Components\DatePicker;
 use Filament\Widgets\ChartWidget;
 use Illuminate\Support\Facades\DB;
 
 class PendaftaranChart extends ChartWidget
 {
-    protected static ?string $heading = 'Pendaftaran';
+    protected static ?string $heading = '📈 Statistik Pendaftaran Pasien';
 
     public $status = null; // default semua status
     public $periode = 'day'; // default per hari
+    public $start_date = null;
+    public $end_date = null;
 
     protected function getFormSchema(): array
     {
         return [
             Select::make('status')
-                ->label('Status')
+                ->label('Filter Status')
                 ->options([
                     'menunggu_verifikasi' => 'Menunggu Verifikasi',
                     'terverifikasi' => 'Terverifikasi',
@@ -31,12 +33,20 @@ class PendaftaranChart extends ChartWidget
                 ->reactive(),
 
             Select::make('periode')
-                ->label('Periode')
+                ->label('Periode Waktu')
                 ->options([
                     'day' => 'Per Hari',
                     'week' => 'Per Minggu',
                     'month' => 'Per Bulan',
                 ])
+                ->reactive(),
+
+            DatePicker::make('start_date')
+                ->label('Dari Tanggal')
+                ->reactive(),
+
+            DatePicker::make('end_date')
+                ->label('Sampai Tanggal')
                 ->reactive(),
         ];
     }
@@ -45,14 +55,27 @@ class PendaftaranChart extends ChartWidget
     {
         $query = Pendaftaran::query();
 
+        // filter status
         if ($this->status) {
             $query->where('status', $this->status);
         }
 
+        // filter tanggal history
+        if ($this->start_date && $this->end_date) {
+            $query->whereBetween('tanggal_pendaftaran', [$this->start_date, $this->end_date]);
+        } elseif ($this->start_date) {
+            $query->whereDate('tanggal_pendaftaran', '>=', $this->start_date);
+        } elseif ($this->end_date) {
+            $query->whereDate('tanggal_pendaftaran', '<=', $this->end_date);
+        } else {
+            // default filter tahun ini
+            $query->whereYear('tanggal_pendaftaran', date('Y'));
+        }
+
+        // generate data sesuai periode
         if ($this->periode === 'day') {
             $data = $query
                 ->select(DB::raw('DATE(tanggal_pendaftaran) as date'), DB::raw('COUNT(*) as total'))
-                ->whereYear('tanggal_pendaftaran', date('Y'))
                 ->groupBy('date')
                 ->orderBy('date')
                 ->pluck('total', 'date');
@@ -60,8 +83,7 @@ class PendaftaranChart extends ChartWidget
             $labels = $data->keys()->map(fn($date) => date('d M', strtotime($date)));
         } elseif ($this->periode === 'week') {
             $data = $query
-                ->select(DB::raw('WEEK(tanggal_pendaftaran) as week'), DB::raw('COUNT(*) as total'))
-                ->whereYear('tanggal_pendaftaran', date('Y'))
+                ->select(DB::raw('YEARWEEK(tanggal_pendaftaran, 1) as week'), DB::raw('COUNT(*) as total'))
                 ->groupBy('week')
                 ->orderBy('week')
                 ->pluck('total', 'week');
@@ -70,7 +92,6 @@ class PendaftaranChart extends ChartWidget
         } else { // month
             $data = $query
                 ->select(DB::raw('MONTH(tanggal_pendaftaran) as month'), DB::raw('COUNT(*) as total'))
-                ->whereYear('tanggal_pendaftaran', date('Y'))
                 ->groupBy('month')
                 ->orderBy('month')
                 ->pluck('total', 'month');
@@ -84,9 +105,16 @@ class PendaftaranChart extends ChartWidget
                 [
                     'label' => 'Jumlah Pendaftaran',
                     'data' => $data->values(),
-                    'backgroundColor' => 'rgba(54, 162, 235, 0.5)',
-                    'borderColor' => 'rgba(54, 162, 235, 1)',
-                    'borderWidth' => 1,
+                    'borderColor' => '#2563eb',
+                    'backgroundColor' => 'rgba(37, 99, 235, 0.2)',
+                    'tension' => 0.4,
+                    'fill' => true,
+                    'pointBackgroundColor' => '#2563eb',
+                    'pointBorderColor' => '#fff',
+                    'pointHoverBackgroundColor' => '#1d4ed8',
+                    'pointHoverBorderColor' => '#fff',
+                    'pointRadius' => 5,
+                    'pointHoverRadius' => 7,
                 ],
             ],
         ];
@@ -95,9 +123,42 @@ class PendaftaranChart extends ChartWidget
     protected function getOptions(): array
     {
         return [
+            'plugins' => [
+                'legend' => [
+                    'display' => true,
+                    'labels' => [
+                        'font' => [
+                            'size' => 14,
+                            'weight' => 'bold',
+                        ],
+                    ],
+                ],
+                'tooltip' => [
+                    'enabled' => true,
+                    'backgroundColor' => '#1e293b',
+                    'titleFont' => ['size' => 14, 'weight' => 'bold'],
+                    'bodyFont' => ['size' => 13],
+                    'padding' => 12,
+                ],
+            ],
             'scales' => [
+                'x' => [
+                    'title' => [
+                        'display' => true,
+                        'text' => 'Periode',
+                        'font' => ['size' => 14, 'weight' => 'bold'],
+                    ],
+                ],
                 'y' => [
                     'beginAtZero' => true,
+                    'ticks' => [
+                        'stepSize' => 1, // angka bulat
+                    ],
+                    'title' => [
+                        'display' => true,
+                        'text' => 'Jumlah Pendaftaran',
+                        'font' => ['size' => 14, 'weight' => 'bold'],
+                    ],
                 ],
             ],
         ];
@@ -105,6 +166,6 @@ class PendaftaranChart extends ChartWidget
 
     protected function getType(): string
     {
-        return 'bar';
+        return 'line';
     }
 }

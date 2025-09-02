@@ -86,7 +86,18 @@ class PasienResource extends Resource
                 Tables\Columns\TextColumn::make('created_at')->label('Dibuat')->since(),
             ])
             ->filters([
-                //
+                Tables\Filters\Filter::make('created_at')
+                    ->form([
+                        Forms\Components\DatePicker::make('tanggal')
+                            ->label('Tanggal')
+                    ])
+                    ->query(function (Builder $query, array $data): Builder {
+                        return $query
+                            ->when(
+                                $data['tanggal'],
+                                fn(Builder $query, $date) => $query->whereDate('created_at', $date)
+                            );
+                    }),
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),

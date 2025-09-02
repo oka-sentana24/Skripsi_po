@@ -12,7 +12,7 @@ class Tindakan extends Model
     protected $fillable = [
         'pendaftaran_id',
         'terapis_id',
-        'jenis_layanan_id',
+        'layanan_id',
         'catatan'
     ];
 
@@ -26,8 +26,20 @@ class Tindakan extends Model
         return $this->belongsTo(Terapis::class);
     }
 
-    public function layanan()
+    public function layanans()
     {
-        return $this->belongsTo(JenisLayanan::class, 'layanan_id'); // Jika kamu pakai 'layanan_id'
+        return $this->belongsToMany(
+            JenisLayanan::class,
+            'tindakan_layanan', // nama pivot table
+            'tindakan_id',      // foreign key pivot untuk Tindakan
+            'layanan_id'        // foreign key pivot untuk JenisLayanan
+        );
+    }
+
+    public function produks()
+    {
+        return $this->belongsToMany(\App\Models\Produk::class, 'tindakan_produk')
+            ->withPivot('jumlah')
+            ->withTimestamps();
     }
 }

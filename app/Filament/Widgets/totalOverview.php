@@ -19,12 +19,12 @@ class totalOverview extends BaseWidget
                 ->description(description: 'Total pasien terdaftar')
                 ->color('primary'), // bisa diganti sesuai tema
 
-            Stat::make(
-                label: 'Janji Temu',
-                value: JanjiTemu::whereDate('tanggal_janji', Carbon::today())->count()
-            )
-                ->description('Jumlah janji temu hari ini')
-                ->color('primary'),
+            // Stat::make(
+            //     label: 'Janji Temu',
+            //     value: JanjiTemu::whereDate('tanggal_janji', Carbon::today())->count()
+            // )
+            //     ->description('Jumlah janji temu hari ini')
+            //     ->color('primary'),
 
 
             Stat::make(

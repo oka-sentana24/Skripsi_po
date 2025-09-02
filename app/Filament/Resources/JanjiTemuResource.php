@@ -36,6 +36,7 @@ class JanjiTemuResource extends Resource
         return 2;
     }
 
+
     public static function form(Form $form): Form
     {
         return $form
@@ -171,5 +172,10 @@ class JanjiTemuResource extends Resource
             // 'create' => Pages\CreateJanjiTemu::route('/create'),
             // 'edit' => Pages\EditJanjiTemu::route('/{record}/edit'),
         ];
+    }
+
+    public static function shouldRegisterNavigation(): bool
+    {
+        return false; // ❌ tidak akan tampil di sidebar
     }
 }

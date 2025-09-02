@@ -15,4 +15,11 @@ class Produk extends Model
     {
         return $this->hasMany(PenjualanProduk::class);
     }
+
+    public function tindakans()
+    {
+        return $this->belongsToMany(\App\Models\Tindakan::class, 'tindakan_produk')
+            ->withPivot('jumlah')
+            ->withTimestamps();
+    }
 }
