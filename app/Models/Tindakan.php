@@ -13,7 +13,8 @@ class Tindakan extends Model
         'pendaftaran_id',
         'terapis_id',
         'layanan_id',
-        'catatan'
+        'catatan',
+        'status',
     ];
 
     public function pendaftaran()
@@ -23,7 +24,7 @@ class Tindakan extends Model
 
     public function terapis()
     {
-        return $this->belongsTo(Terapis::class);
+        return $this->belongsTo(Terapis::class, 'terapis_id');
     }
 
     public function layanans()

@@ -48,7 +48,7 @@ class CreatePendaftaran extends CreateRecord
                 ]);
             });
 
-            $data['status'] = 'terverifikasi';
+            $data['status'] = 'menunggu';
             $data['antrean_id'] = $antrean->id;
         } else {
             // Dari janji temu

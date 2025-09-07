@@ -90,6 +90,8 @@ class EditTindakan extends EditRecord
                 'total_layanan' => $totalLayanan,
                 'total_produk'  => $totalProduk,
                 'total_bayar'   => $totalBayar,
+                'status'        => 'menunggu_pembayaran', // tambahkan ini
+
             ]);
             // Notification::make()
             //     ->title('Pembayaran Diperbarui')
@@ -102,6 +104,8 @@ class EditTindakan extends EditRecord
                 'total_produk'  => $totalProduk,
                 'diskon'        => 0,
                 'total_bayar'   => $totalBayar,
+                'status'        => 'menunggu_pembayaran', // tambahkan ini
+
             ]);
             // Notification::make()
             //     ->title('Pembayaran Dibuat')

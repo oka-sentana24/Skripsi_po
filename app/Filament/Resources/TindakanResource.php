@@ -87,8 +87,17 @@ class TindakanResource extends Resource
                     ->columns(2)
                     ->description('Detail pemeriksaan pasien')
                     ->schema([
-                        Forms\Components\Select::make('terapi_id')
-                            ->label('Terapi')
+                        Forms\Components\Select::make('status')
+                            ->label('Status Tindakan')
+                            ->options([
+                                'menunggu' => 'Menunggu',
+                                'proses'   => 'DiProses',
+                                'selesai'  => 'Selesai',
+                            ])
+                            ->required(),
+
+                        Forms\Components\Select::make('terapis_id')
+                            ->label('Terapis')
                             ->options(Terapis::all()->pluck('nama', 'id')) // ambil list terapi
                             ->searchable()
                             ->required(),
@@ -142,6 +151,15 @@ class TindakanResource extends Resource
                     ->label('Catatan')
                     ->limit(30)
                     ->wrap(),
+
+                Tables\Columns\BadgeColumn::make('status')
+                    ->label('Status')
+                    ->colors([
+                        'warning' => 'menunggu',
+                        'info'    => 'proses',
+                        'success' => 'selesai',
+                    ])
+                    ->sortable(),
 
                 Tables\Columns\TextColumn::make('created_at')
                     ->label('Dibuat')
