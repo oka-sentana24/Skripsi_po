@@ -5,6 +5,7 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\TindakanResource\Pages;
 use App\Filament\Resources\TindakanResource\RelationManagers;
 use App\Models\Pendaftaran;
+use App\Models\Terapis;
 use App\Models\Tindakan;
 use Filament\Forms;
 use Filament\Forms\Form;
@@ -33,91 +34,77 @@ class TindakanResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\Select::make('pendaftaran_id')
-                    ->label('Nomor Antrean')
-                    ->options(
-                        Pendaftaran::with('antrean')
-                            ->get()
-                            ->pluck('antrean.nomor_antrean', 'id')
-                    )
-                    ->searchable()
-                    ->disabled()
-                    ->required(),
+                Forms\Components\Section::make('Data Pasien')
+                    ->description('Informasi pasien dari nomor antrean yang dipilih')
+                    ->columns(2)
+                    ->schema([
+                        Forms\Components\Select::make('pendaftaran_id')
+                            ->label('Nomor Antrean')
+                            ->options(
+                                Pendaftaran::with('antrean')
+                                    ->whereHas('antrean')
+                                    ->get()
+                                    ->pluck('antrean.nomor_antrean', 'id')
+                            )
+                            ->searchable()
+                            ->required()
+                            ->disabled()
+                            ->reactive(),
 
-                Forms\Components\Select::make('pendaftaran_id')
-                    ->label('Pasien')
-                    ->options(
-                        Pendaftaran::with('pasien')
-                            ->get()
-                            ->pluck('pasien.nama', 'id')
-                    )
-                    ->searchable()
-                    ->disabled()
-                    ->required(),
+                        Forms\Components\Select::make('pendaftaran_id')
+                            ->label('Nama Pasien')
+                            ->options(
+                                Pendaftaran::with('pasien')
+                                    ->whereHas('antrean') // pastikan hanya yang punya antrean
+                                    ->get()
+                                    ->mapWithKeys(function ($pendaftaran) {
+                                        return [
+                                            $pendaftaran->id => $pendaftaran->pasien?->nama ?? '-', // tampilkan nama pasien
+                                        ];
+                                    })
+                            )
+                            ->searchable()
+                            ->disabled()
+                            ->required()
+                            ->reactive(),
 
-                Forms\Components\Select::make('terapis_id')
-                    ->label('Terapis')
-                    ->relationship('terapis', 'nama')
-                    ->searchable()
-                    ->required(),
+                        Forms\Components\Textarea::make('riwayat_pasien')
+                            ->label('Riwayat Pasien')
+                            ->disabled()
+                            ->rows(3)
+                            ->dehydrated(false)
+                            ->reactive()
+                            ->afterStateHydrated(function ($component, $state, $get) {
+                                $pendaftaranId = $get('pendaftaran_id');
+                                if ($pendaftaranId) {
+                                    $riwayat = Pendaftaran::find($pendaftaranId)?->catatan;
+                                    $component->state($riwayat ?? '-');
+                                }
+                            }),
+                    ]),
 
-                Forms\Components\Select::make('layanans')
-                    ->label('Jenis Layanan')
-                    ->relationship('layanans', 'nama') // harus sama persis dengan relasi di model
-                    ->multiple()
-                    ->required(),
+                Forms\Components\Section::make('Pemeriksaan')
+                    ->columns(2)
+                    ->description('Detail pemeriksaan pasien')
+                    ->schema([
+                        Forms\Components\Select::make('terapi_id')
+                            ->label('Terapi')
+                            ->options(Terapis::all()->pluck('nama', 'id')) // ambil list terapi
+                            ->searchable()
+                            ->required(),
 
+                        Forms\Components\Select::make('layanans')
+                            ->label('Jenis Layanan')
+                            ->relationship('layanans', 'nama') // relasi ke model Layanan
+                            ->multiple()
+                            ->searchable()
+                            ->preload()
+                            ->required(),
 
-                Forms\Components\Textarea::make('catatan')
-                    ->label('Riwayat pasien')
-                    ->nullable()
-                    ->default(function ($get) {
-                        $pendaftaranId = $get('pendaftaran_id');
-                        if ($pendaftaranId) {
-                            $pendaftaran = Pendaftaran::find($pendaftaranId);
-                            return $pendaftaran?->catatan; // ambil catatan dari pendaftaran
-                        }
-                        return null;
-                    }),
-
-                Forms\Components\Textarea::make('catatan')
-                    ->label('Catatan')
-                    ->nullable(),
-
-                // Forms\Components\Repeater::make('produks')
-                //     ->relationship('produks') // pivot table sudah benar karena di model sudah fix
-                //     ->schema([
-                //         Forms\Components\Select::make('id') // pakai 'id' dari Produk
-                //             ->label('Produk')
-                //             ->options(\App\Models\Produk::all()->pluck('nama', 'id'))
-                //             ->required(),
-
-                //         Forms\Components\TextInput::make('jumlah')
-                //             ->label('Jumlah')
-                //             ->numeric()
-                //             ->default(1)
-                //             ->required(),
-                //     ])
-                //     ->label('Produk yang Dibeli')
-                //     ->columns(2)
-                //     ->createItemButtonLabel('Tambah Produk'),
-
-                // Forms\Components\Repeater::make('produks')
-                //     ->relationship('produks') // relasi many-to-many di Tindakan model
-                //     ->schema([
-                //         Forms\Components\Select::make('produk_id') // gunakan id dari Produk
-                //             ->label('Produk')
-                //             ->options(\App\Models\Produk::all()->pluck('nama', 'id'))
-                //             ->required(),
-
-                //         Forms\Components\TextInput::make('jumlah')
-                //             ->label('Jumlah')
-                //             ->numeric()
-                //             ->default(1)
-                //             ->required(),
-                //     ])
-                //     ->columns(2)
-                //     ->createItemButtonLabel('Tambah Produk'),
+                        Forms\Components\Textarea::make('catatan')
+                            ->label('Catatan Pemeriksaan')
+                            ->nullable(),
+                    ]),
             ]);
     }
 

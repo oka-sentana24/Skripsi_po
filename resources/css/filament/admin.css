@@ -1,0 +1,22 @@
+/* Custom theme Filament tanpa Tailwind */
+.fi-sidebar {
+    background: #1e293b !important;
+    color: #f8fafc !important;
+}
+
+.fi-sidebar a {
+    color: #f8fafc !important;
+}
+
+.fi-sidebar a:hover {
+    background: #334155 !important;
+}
+
+.fi-btn {
+    background: #2563eb !important; /* biru */
+    color: #fff !important;
+}
+
+.fi-btn:hover {
+    background: #1e40af !important;
+}

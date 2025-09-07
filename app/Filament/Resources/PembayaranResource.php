@@ -5,6 +5,7 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\PembayaranResource\Pages;
 use App\Filament\Resources\PembayaranResource\RelationManagers;
 use App\Models\Pembayaran;
+use App\Models\Pendaftaran;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -33,11 +34,16 @@ class PembayaranResource extends Resource
         return $form
             ->schema([
                 Forms\Components\Select::make('pendaftaran_id')
-                    ->relationship('pendaftaran', 'id')
-                    ->label('Pendaftaran')
+                    ->label('Pasien')
+                    ->options(
+                        Pendaftaran::with('pasien')
+                            ->get()
+                            ->pluck('pasien.nama', 'id')
+                    )
                     ->searchable()
+                    ->disabled()
                     ->required(),
-
+                    
                 Forms\Components\TextInput::make('total_layanan')
                     ->numeric()
                     ->prefix('Rp')
@@ -64,8 +70,11 @@ class PembayaranResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('pendaftaran.id')
-                    ->label('ID Pendaftaran'),
+                Tables\Columns\TextColumn::make('pendaftaran.pasien.antrean.nomor_antrean')
+                    ->label('Nomor Antrean'),
+
+                    Tables\Columns\TextColumn::make('pendaftaran.pasien.nama')
+                    ->label('Nama'),
 
                 Tables\Columns\TextColumn::make('total_layanan')
                     ->money('IDR'),

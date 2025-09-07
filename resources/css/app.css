@@ -1,0 +1,17 @@
+/* resources/css/app.css */
+
+/* Ubah background sidebar */
+aside.fi-sidebar {
+    background-color: #0f172a !important; /* warna navy gelap */
+    color: #fff !important;
+}
+
+/* Hover item sidebar */
+aside.fi-sidebar .fi-sidebar-item-button:hover {
+    background-color: #1e293b !important;
+}
+
+/* Aktif item sidebar */
+aside.fi-sidebar .fi-sidebar-item-active {
+    background-color: #334155 !important;
+}

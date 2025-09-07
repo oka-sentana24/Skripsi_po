@@ -1,0 +1,15 @@
+/* Override warna sidebar Filament */
+.fi-sidebar {
+    background-color: #1e293b !important; /* slate-800 */
+    color: #f8fafc !important;
+}
+
+/* Link menu */
+.fi-sidebar a {
+    color: #f8fafc !important;
+}
+
+/* Hover menu item */
+.fi-sidebar a:hover {
+    background-color: #334155 !important; /* slate-700 */
+}

@@ -1,0 +1,21 @@
+/* ✅ Aman: hanya ubah warna */
+aside.fi-sidebar {
+    background-color: #0f172a !important; /* warna background */
+}
+
+/* Ubah warna teks label */
+aside.fi-sidebar .fi-sidebar-item-label {
+    color: #f8fafc !important;
+}
+
+/* Hover */
+aside.fi-sidebar .fi-sidebar-item-button:hover {
+    background-color: #1e293b !important;
+    color: #fff !important;
+}
+
+/* Active */
+aside.fi-sidebar .fi-sidebar-item-active > .fi-sidebar-item-button {
+    background-color: #334155 !important;
+    color: #fff !important;
+}

@@ -54,19 +54,19 @@ class Pasien extends Model
     }
 
     /**
-     * Generate nomor rekam medik unik
+     * Generate nomor rekam medik unik (berkelanjutan selamanya)
      */
     public static function generateRekamMedikNumber(): string
     {
         $kodeKlinik = "AIRE";
-        $yearMonth = date('Ym');
 
-        $lastPatient = self::where('no_rm', 'LIKE', "$kodeKlinik-$yearMonth%")
-            ->orderByDesc('id')
-            ->first();
+        // Ambil pasien terakhir berdasarkan ID (yang terbaru dibuat)
+        $lastPatient = self::orderByDesc('id')->first();
 
-        $lastId = $lastPatient ? intval(substr($lastPatient->no_rm, -4)) : 0;
+        // Ambil angka urut terakhir, default 0 kalau belum ada pasien
+        $lastId = $lastPatient ? intval(substr($lastPatient->no_rm, -6)) : 0;
 
-        return sprintf('%s-%s-%04d', $kodeKlinik, $yearMonth, $lastId + 1);
+        // Format nomor RM baru (6 digit angka berurutan)
+        return sprintf('%s-%06d', $kodeKlinik, $lastId + 1);
     }
 }
