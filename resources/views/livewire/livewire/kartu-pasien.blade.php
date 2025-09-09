@@ -39,14 +39,13 @@
                         font-size: 1.2rem;
                         font-weight: bold;
                         color: #7f1d1d;
-                    ">Klinik Sehat Sentosa</h1>
+                    ">Aire Aesthetic Bali</h1>
                     <p style="
                         margin: 0;
                         font-size: 0.85rem;
                         color: #7f1d1d;
                     ">
-                        Jl. Contoh Alamat No. 123<br>
-                        Jakarta Selatan
+                        Jl. Tanah Putih No.32, <br/>Darmasaba, Kec. Abiansemal, Kabupaten Badung, Bali 80352
                     </p>
                 </div>
             </div>

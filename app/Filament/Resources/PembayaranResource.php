@@ -6,6 +6,7 @@ use App\Filament\Resources\PembayaranResource\Pages;
 use App\Models\Pembayaran;
 use App\Models\Pendaftaran;
 use App\Models\Produk;
+use Filament\Actions\Action;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -63,7 +64,6 @@ class PembayaranResource extends Resource
                     ->label('Produk')
                     ->columns(4)
                     ->createItemButtonLabel('Tambah Produk')
-                    ->relationship('produk') // <-- ini penting supaya data pivot muncul saat edit
                     ->reactive()
                     ->afterStateUpdated(function ($state, callable $set, $get) {
                         $totalProduk = collect($state ?? [])->sum(fn($item) => ($item['jumlah'] ?? 0) * ($item['harga'] ?? 0));
@@ -76,6 +76,7 @@ class PembayaranResource extends Resource
                         Forms\Components\Select::make('produk_id')
                             ->label('Produk')
                             ->options(Produk::all()->pluck('nama', 'id'))
+                            ->searchable()
                             ->reactive()
                             ->afterStateUpdated(function ($state, callable $set, $get) {
                                 if ($state) {
@@ -130,6 +131,7 @@ class PembayaranResource extends Resource
                     ]),
 
 
+
                 Forms\Components\TextInput::make('total_bayar')
                     ->label('Total Bayar')
                     ->numeric()
@@ -151,16 +153,20 @@ class PembayaranResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('pendaftaran.pasien.antrean.nomor_antrean')
-                    ->label('Nomor Antrean'),
-
                 Tables\Columns\TextColumn::make('pendaftaran.pasien.nama')
                     ->label('Nama'),
 
                 Tables\Columns\TextColumn::make('total_layanan')->money('IDR'),
-                Tables\Columns\TextColumn::make('total_produk')->money('IDR'),
+                // Tables\Columns\TextColumn::make('total_produk')->money('IDR'),
                 Tables\Columns\TextColumn::make('diskon')->money('IDR'),
                 Tables\Columns\TextColumn::make('total_bayar')->money('IDR'),
+
+                Tables\Columns\TextColumn::make('produk')
+                    ->label('Produk')
+                    ->formatStateUsing(
+                        fn($state, $record) =>
+                        $record->produk->map(fn($p) => $p->nama . ' (x' . $p->pivot->jumlah . ')')->join(', ')
+                    ),
 
                 Tables\Columns\TextColumn::make('status')
                     ->label('Status')
@@ -172,19 +178,30 @@ class PembayaranResource extends Resource
                     })
                     ->badge()
                     ->sortable(),
-
-                Tables\Columns\TextColumn::make('produk')
-                    ->label('Produk')
-                    ->formatStateUsing(
-                        fn($state, $record) =>
-                        $record->produk->map(fn($p) => $p->nama . ' (x' . $p->pivot->jumlah . ')')->join(', ')
-                    ),
-
-                Tables\Columns\TextColumn::make('created_at')
-                    ->dateTime()
-                    ->label('Dibuat pada'),
             ])
-            ->actions([Tables\Actions\EditAction::make()])
+            ->actions([
+                Tables\Actions\EditAction::make(),
+                Tables\Actions\Action::make('print_invoice')
+                    ->label('Cetak Invoice')
+                    ->icon('heroicon-o-printer')
+                    ->modalHeading('Cetak Invoice Pembayaran')
+                    ->modalContent(
+                        fn($record) =>
+                        view('livewire.invoice-show', ['pembayaran' => $record])
+                    )
+                    ->modalActions([
+                        Action::make('close')
+                            ->label('Tutup')
+                            ->color('gray')
+                            ->close(),
+
+                        Action::make('print')
+                            ->label('Cetak Kartu')
+                            ->button()
+                            ->color('primary')
+                            ->extraAttributes(['onclick' => 'window.print()']),
+                    ]),
+            ])
             ->bulkActions([Tables\Actions\DeleteBulkAction::make()]);
     }
 

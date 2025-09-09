@@ -113,4 +113,9 @@ class PenjualanProdukResource extends Resource
             'edit' => Pages\EditPenjualanProduk::route('/{record}/edit'),
         ];
     }
+
+    public static function shouldRegisterNavigation(): bool
+    {
+        return false; // ❌ tidak akan tampil di sidebar
+    }
 }

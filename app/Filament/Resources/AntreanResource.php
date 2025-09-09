@@ -115,4 +115,9 @@ class AntreanResource extends Resource
             'edit' => Pages\EditAntrean::route('/{record}/edit'),
         ];
     }
+
+    public static function shouldRegisterNavigation(): bool
+    {
+        return false; // ❌ tidak akan tampil di sidebar
+    }
 }
