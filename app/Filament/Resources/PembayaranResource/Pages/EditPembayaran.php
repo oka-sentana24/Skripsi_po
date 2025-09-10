@@ -26,6 +26,40 @@ class EditPembayaran extends EditRecord
         return $data;
     }
 
+    // protected function afterSave(): void
+    // {
+    //     $pembayaran = $this->record;
+
+    //     if (!empty($this->produkTemp)) {
+    //         // kembalikan stok lama
+    //         foreach ($pembayaran->produk as $oldProduk) {
+    //             $oldProduk->stok += $oldProduk->pivot->jumlah;
+    //             $oldProduk->save();
+    //         }
+
+    //         // reset pivot
+    //         $pembayaran->produk()->detach();
+
+    //         // attach produk baru & kurangi stok
+    //         foreach ($this->produkTemp as $item) {
+    //             $produk = \App\Models\Produk::find($item['produk_id']);
+    //             if ($produk) {
+    //                 $jumlah = $item['jumlah'] ?? 0;
+    //                 $harga = $item['harga'] ?? 0; // gunakan harga input user saja
+
+    //                 $pembayaran->produk()->attach($produk->id, [
+    //                     'jumlah' => $jumlah,
+    //                     'harga'  => $harga,
+    //                 ]);
+
+    //                 // kurangi stok produk
+    //                 $produk->stok = max($produk->stok - $jumlah, 0);
+    //                 $produk->save();
+    //             }
+    //         }
+    //     }
+    // }
+
     protected function afterSave(): void
     {
         $pembayaran = $this->record;
@@ -45,7 +79,7 @@ class EditPembayaran extends EditRecord
                 $produk = \App\Models\Produk::find($item['produk_id']);
                 if ($produk) {
                     $jumlah = $item['jumlah'] ?? 0;
-                    $harga = $item['harga'] ?? 0; // gunakan harga input user saja
+                    $harga = $item['harga'] ?? 0;
 
                     $pembayaran->produk()->attach($produk->id, [
                         'jumlah' => $jumlah,
@@ -58,7 +92,12 @@ class EditPembayaran extends EditRecord
                 }
             }
         }
+
+        // --- Tambahkan ini untuk otomatis ubah status ---
+        $pembayaran->status = 'lunas';
+        $pembayaran->save();
     }
+
 
 
 

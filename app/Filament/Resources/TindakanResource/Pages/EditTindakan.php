@@ -70,11 +70,9 @@ class EditTindakan extends EditRecord
 
         // --- 1. Simpan produk ke pivot table ---
         $produkState = $this->form->getState()['produks'] ?? [];
-
         $syncData = collect($produkState)->mapWithKeys(fn($item) => [
             $item['produk_id'] => ['jumlah' => $item['jumlah']],
         ])->toArray();
-
         $tindakan->produks()->sync($syncData);
 
         // --- 2. Hitung total layanan & produk ---
@@ -90,34 +88,27 @@ class EditTindakan extends EditRecord
                 'total_layanan' => $totalLayanan,
                 'total_produk'  => $totalProduk,
                 'total_bayar'   => $totalBayar,
-                'status'        => 'menunggu_pembayaran', // tambahkan ini
-
+                'status'        => 'menunggu_pembayaran',
             ]);
-            // Notification::make()
-            //     ->title('Pembayaran Diperbarui')
-            //     ->body("Pembayaran untuk pasien <b>{$pendaftaran->pasien->nama}</b> berhasil diperbarui.")
-            //     ->success()
-            //     ->send();
         } else {
             $pendaftaran->pembayaran()->create([
                 'total_layanan' => $totalLayanan,
                 'total_produk'  => $totalProduk,
                 'diskon'        => 0,
                 'total_bayar'   => $totalBayar,
-                'status'        => 'menunggu_pembayaran', // tambahkan ini
-
+                'status'        => 'menunggu_pembayaran',
             ]);
-            // Notification::make()
-            //     ->title('Pembayaran Dibuat')
-            //     ->body("Pembayaran baru untuk pasien <b>{$pendaftaran->pasien->nama}</b> berhasil dibuat.")
-            //     ->success()
-            //     ->send();
         }
 
-        // --- 4. Notifikasi utama bahwa tindakan berhasil disimpan ---
+        // --- 4. Set status tindakan menjadi selesai ---
+        $tindakan->update([
+            'status' => 'selesai',
+        ]);
+
+        // --- 5. Notifikasi utama ---
         Notification::make()
             ->title('Berhasil')
-            ->body("Tindakan untuk pasien <b>{$pendaftaran->pasien->nama}</b> berhasil disimpan.")
+            ->body("Tindakan untuk pasien <b>{$pendaftaran->pasien->nama}</b> berhasil disimpan dan selesai.")
             ->success()
             ->send();
     }

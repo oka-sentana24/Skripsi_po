@@ -12,6 +12,7 @@ use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Columns\TagsColumn;
+use Filament\Tables\Filters\Filter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
@@ -87,15 +88,6 @@ class TindakanResource extends Resource
                     ->columns(2)
                     ->description('Detail pemeriksaan pasien')
                     ->schema([
-                        Forms\Components\Select::make('status')
-                            ->label('Status Tindakan')
-                            ->options([
-                                'menunggu' => 'Menunggu',
-                                'proses'   => 'DiProses',
-                                'selesai'  => 'Selesai',
-                            ])
-                            ->required(),
-
                         Forms\Components\Select::make('terapis_id')
                             ->label('Terapis')
                             ->options(Terapis::all()->pluck('nama', 'id')) // ambil list terapi
@@ -166,7 +158,17 @@ class TindakanResource extends Resource
                     ->dateTime('d M Y H:i'),
             ])
             ->filters([
-                //
+                Filter::make('tanggal')
+                    ->form([
+                        Forms\Components\DatePicker::make('tanggal')
+                            ->label('Tanggal')
+                            ->default(now()), // default hari ini
+                    ])
+                    ->query(function (Builder $query, array $data) {
+                        return $query->when($data['tanggal'] ?? null, function (Builder $query, $tanggal) {
+                            $query->whereDate('created_at', $tanggal);
+                        });
+                    }),
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),

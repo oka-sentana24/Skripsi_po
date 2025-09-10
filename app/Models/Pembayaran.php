@@ -16,6 +16,7 @@ class Pembayaran extends Model
         'diskon',
         'total_bayar',
         'status',
+        'metode_pembayaran',
     ];
 
     public function pendaftaran()
