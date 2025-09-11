@@ -23,6 +23,11 @@ class JenisLayananResource extends Resource
     // protected static ?string $modelLabel = 'Layanan';
     protected static ?string $pluralModelLabel = 'Jenis Layanan';
 
+    public static function canViewAny(): bool
+    {
+        return auth()->check() && in_array(auth()->user()->role, ['admin', 'eksekutif']);
+    }
+
     public static function form(Form $form): Form
     {
         return $form

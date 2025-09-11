@@ -33,6 +33,12 @@ class PasienResource extends Resource
         return 1;
     }
 
+    public static function canViewAny(): bool
+    {
+        return auth()->check() && in_array(auth()->user()->role, ['admin', 'eksekutif']);
+    }
+
+
     /**
      * Form input untuk tambah/edit pasien
      */
@@ -107,7 +113,6 @@ class PasienResource extends Resource
                     ->date('d/m/Y'),
                 Tables\Columns\TextColumn::make('no_hp')->label('No. HP'),
                 Tables\Columns\TextColumn::make('email')->label('Email'),
-                Tables\Columns\TextColumn::make('created_at')->label('Dibuat')->since(),
             ])
             ->defaultSort('created_at', 'desc')
             ->filters([

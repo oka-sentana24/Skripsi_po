@@ -26,6 +26,12 @@ class ProdukResource extends Resource
     protected static ?string $modelLabel = 'Produk';
     protected static ?string $pluralModelLabel = 'Data Produk';
 
+    public static function canViewAny(): bool
+    {
+        return auth()->check() && auth()->user()->role === ['admin', 'eksekutif'];
+    }
+
+
     public static function form(Form $form): Form
     {
         return $form

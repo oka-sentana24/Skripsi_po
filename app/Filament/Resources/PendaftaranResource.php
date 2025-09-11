@@ -35,6 +35,12 @@ class PendaftaranResource extends Resource
         return 3;
     }
 
+    public static function canViewAny(): bool
+    {
+        return auth()->check() && in_array(auth()->user()->role, ['admin', 'eksekutif']);
+    }
+
+
     /**
      * Form input untuk create / edit
      */
@@ -103,6 +109,11 @@ class PendaftaranResource extends Resource
                     ->sortable()
                     ->searchable(),
 
+                Tables\Columns\TextColumn::make('pasien.no_rm')
+                    ->label('Pasien')
+                    ->sortable()
+                    ->searchable(),
+
                 // Nama pasien
                 Tables\Columns\TextColumn::make('pasien.nama')
                     ->label('Pasien')
@@ -128,12 +139,6 @@ class PendaftaranResource extends Resource
                     ->badge()
                     ->sortable()
                     ->searchable(),
-
-                // Tanggal dibuat
-                Tables\Columns\TextColumn::make('created_at')
-                    ->label('Dibuat')
-                    ->dateTime('d/m/Y H:i')
-                    ->sortable(),
             ])
             ->filters([
                 // Filter berdasarkan tanggal registrasi
@@ -154,12 +159,13 @@ class PendaftaranResource extends Resource
             ])
             ->actions([
                 // Aksi edit per baris
-                Tables\Actions\EditAction::make()->label('Edit'),
+                Tables\Actions\EditAction::make()->label(''),
 
                 // Aksi cetak kartu pasien
                 Tables\Actions\Action::make('print_card')
-                    ->label('Cetak Nomor Antrean')
+                    ->label('')
                     ->icon('heroicon-o-printer')
+                    ->tooltip('Cetak Kartu Pasien')
                     ->modalHeading('Kartu Pasien')
                     ->modalWidth('lg')
                     ->modalContent(

@@ -30,6 +30,12 @@ class PembayaranResource extends Resource
         return 5;
     }
 
+    public static function canViewAny(): bool
+    {
+        return auth()->check() && in_array(auth()->user()->role, ['kasir', 'admin', 'eksekutif']);
+    }
+
+
     public static function form(Form $form): Form
     {
         return $form
@@ -131,6 +137,14 @@ class PembayaranResource extends Resource
                                 $diskon = (float) ($get('diskon') ?? 0);
                                 $set('total_bayar', $totalLayanan + $totalProduk - $diskon);
                             }),
+                        Forms\Components\TextInput::make('total_layanan')
+                            ->label('Total Layanan')
+                            ->numeric()
+                            ->prefix('Rp')
+                            ->default(0)
+                            ->reactive()
+                            ->dehydrated(),
+
                         Forms\Components\Repeater::make('produk')
                             ->label('Produk')
                             ->columns(4)
@@ -183,14 +197,6 @@ class PembayaranResource extends Resource
                                 $set('total_produk', $totalProduk);
                                 $set('total_bayar', $totalLayanan + $totalProduk - $diskon);
                             }),
-
-                        Forms\Components\TextInput::make('total_layanan')
-                            ->label('Total Layanan')
-                            ->numeric()
-                            ->prefix('Rp')
-                            ->default(0)
-                            ->reactive()
-                            ->dehydrated(),
                     ])
                     ->columns(1),
 

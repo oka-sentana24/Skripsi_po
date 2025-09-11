@@ -22,6 +22,12 @@ class TerapisResource extends Resource
     protected static ?string $modelLabel = 'Terapis';
     protected static ?string $pluralModelLabel = 'Data Terapis';
 
+    public static function canViewAny(): bool
+    {
+        return auth()->check() && in_array(auth()->user()->role, ['admin', 'eksekutif']);
+    }
+
+
     public static function form(Form $form): Form
     {
         return $form
