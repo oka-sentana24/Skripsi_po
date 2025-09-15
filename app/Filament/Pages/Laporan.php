@@ -13,9 +13,8 @@ use Filament\Pages\Page;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 
-
 use Illuminate\Support\Facades\Blade;
-use Maatwebsite\Excel\Facades\Excel;           // <-- Tambahkan ini
+use Maatwebsite\Excel\Facades\Excel;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\WithHeadings;
@@ -118,15 +117,17 @@ class Laporan extends Page implements HasForms
             ->whereBetween('created_at', [$start, $end]);
 
         if (!empty($filter)) {
-            $query->whereHas('produk', fn($q) => $q->where('nama', 'like', "%{$filter}%"))
-                ->orWhereHas('pendaftaran.pasien', fn($q) => $q->where('nama', 'like', "%{$filter}%"));
+            $query->where(function ($q) use ($filter) {
+                $q->whereHas('produk', fn($q) => $q->where('nama', 'like', "%{$filter}%"))
+                    ->orWhereHas('pendaftaran.pasien', fn($q) => $q->where('nama', 'like', "%{$filter}%"));
+            });
         }
 
         $results = $query->latest()->get()->map(fn($item) => [
             'tanggal'     => $item->created_at?->format('Y-m-d') ?? '-',
             'nama_produk' => $item->produk->nama ?? '-',
             'jumlah'      => $item->jumlah,
-            'subtotal'    => number_format($item->subtotal, 0, ',', '.'),
+            'subtotal'    => $item->subtotal,
             'nama_pasien' => $item->pendaftaran->pasien->nama ?? '-',
         ]);
 
@@ -139,9 +140,11 @@ class Laporan extends Page implements HasForms
             ->whereBetween('created_at', [$start, $end]);
 
         if (!empty($filter)) {
-            $query->whereHas('pendaftaran.pasien', fn($q) => $q->where('nama', 'like', "%{$filter}%"))
-                ->orWhereHas('pendaftaran.tindakans.terapis', fn($q) => $q->where('nama', 'like', "%{$filter}%"))
-                ->orWhereHas('pendaftaran.tindakans.layanans', fn($q) => $q->where('nama', 'like', "%{$filter}%"));
+            $query->where(function ($q) use ($filter) {
+                $q->whereHas('pendaftaran.pasien', fn($q) => $q->where('nama', 'like', "%{$filter}%"))
+                    ->orWhereHas('pendaftaran.tindakans.terapis', fn($q) => $q->where('nama', 'like', "%{$filter}%"))
+                    ->orWhereHas('pendaftaran.tindakans.layanans', fn($q) => $q->where('nama', 'like', "%{$filter}%"));
+            });
         }
 
         $results = $query->latest()->get()->flatMap(
@@ -153,8 +156,8 @@ class Laporan extends Page implements HasForms
                     'pasien'      => $pembayaran->pendaftaran->pasien->nama ?? '-',
                     'terapis'     => $tindakan->terapis->nama ?? '-',
                     'layanan'     => $layanan->nama ?? '-',
-                    'harga'       => number_format($layanan->harga, 0, ',', '.'),
-                    'total_bayar' => number_format($pembayaran->total_bayar, 0, ',', '.'),
+                    'harga'       => $layanan->harga,
+                    'total_bayar' => $pembayaran->total_bayar,
                     'status'      => ucfirst($pembayaran->status),
                 ])
             )
@@ -194,33 +197,12 @@ class Laporan extends Page implements HasForms
 
     protected function getReportDataForExport(): Collection
     {
-        $data = $this->form->getState();
-        $reportType = $data['reportType'] ?? 'penjualan_produk';
-        $start = Carbon::parse($data['startDate'])->startOfDay()->toDateTimeString();
-        $end = Carbon::parse($data['endDate'])->endOfDay()->toDateTimeString();
-        $filter = $data['filter'] ?? null;
-
-        // Panggil metode query yang sesuai
-        switch ($reportType) {
-            case 'penjualan_produk':
-                $queryData = $this->getPenjualanProdukQuery($start, $end, $filter);
-                break;
-            case 'pembayaran_layanan':
-                $queryData = $this->getPembayaranLayananQuery($start, $end, $filter);
-                break;
-            case 'kunjungan_pasien':
-                $queryData = $this->getKunjunganPasienQuery($start, $end, $filter);
-                break;
-            default:
-                $queryData = ['data' => []];
-        }
-
-        return collect($queryData['data'] ?? []);
+        $this->generateReport();
+        return $this->reportData;
     }
 
-    /**
-     * Method untuk ekspor ke file Excel.
-     */
+    // ========================== EXPORT ==========================
+
     public function exportToExcel()
     {
         $reportData = $this->getReportDataForExport();
@@ -229,9 +211,7 @@ class Laporan extends Page implements HasForms
             return;
         }
 
-        $headers = $this->reportData->isNotEmpty()
-            ? array_map(fn($k) => ucwords(str_replace('_', ' ', $k)), array_keys((array) $this->reportData->first()))
-            : [];
+        $headers = $this->headers;
 
         $export = new class($reportData, $headers) implements FromCollection, WithHeadings {
             protected $data;
@@ -245,15 +225,7 @@ class Laporan extends Page implements HasForms
 
             public function collection(): Collection
             {
-                return $this->data->map(function ($row) {
-                    $item = (array) $row;
-                    foreach ($item as $key => $value) {
-                        if (is_string($value) && str_contains($value, '.')) {
-                            $item[$key] = (int) str_replace('.', '', $value);
-                        }
-                    }
-                    return $item;
-                });
+                return $this->data->map(fn($row) => (array) $row);
             }
 
             public function headings(): array
@@ -265,21 +237,17 @@ class Laporan extends Page implements HasForms
         return Excel::download($export, $this->selectedReportTitle . '.xlsx');
     }
 
-    /**
-     * Method untuk ekspor ke file PDF.
-     */
     public function exportToPdf()
     {
-        $this->reportData = $this->getReportDataForExport();
-        if ($this->reportData->isEmpty()) {
+        $reportData = $this->getReportDataForExport();
+        if ($reportData->isEmpty()) {
             $this->notify('error', 'Tidak ada data untuk diekspor.');
             return;
         }
 
-        // Buat view khusus untuk PDF agar tampilannya rapi
         $html = Blade::render('pdfs.laporan', [
             'reportTitle' => $this->selectedReportTitle,
-            'reportData' => $this->reportData,
+            'reportData' => $reportData,
             'headers' => $this->headers,
         ]);
 
