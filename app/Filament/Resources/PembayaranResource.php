@@ -32,7 +32,7 @@ class PembayaranResource extends Resource
 
     public static function canViewAny(): bool
     {
-        return auth()->check() && in_array(auth()->user()->role, ['kasir', 'admin', 'eksekutif']);
+        return auth()->check() && in_array(auth()->user()->role, ['kasir']);
     }
 
 

@@ -35,7 +35,7 @@ class PasienResource extends Resource
 
     public static function canViewAny(): bool
     {
-        return auth()->check() && in_array(auth()->user()->role, ['admin', 'eksekutif']);
+        return auth()->check() && in_array(auth()->user()->role, ['admin']);
     }
 
 

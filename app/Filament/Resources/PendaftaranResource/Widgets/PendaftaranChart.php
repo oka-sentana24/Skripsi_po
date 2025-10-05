@@ -38,6 +38,7 @@ class PendaftaranChart extends ChartWidget
                     'day' => 'Per Hari',
                     'week' => 'Per Minggu',
                     'month' => 'Per Bulan',
+                    'year' => "per Tahun"
                 ])
                 ->reactive(),
 

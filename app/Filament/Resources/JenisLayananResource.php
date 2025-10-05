@@ -25,7 +25,7 @@ class JenisLayananResource extends Resource
 
     public static function canViewAny(): bool
     {
-        return auth()->check() && in_array(auth()->user()->role, ['admin', 'eksekutif']);
+        return auth()->check() && in_array(auth()->user()->role, ['admin']);
     }
 
     public static function form(Form $form): Form

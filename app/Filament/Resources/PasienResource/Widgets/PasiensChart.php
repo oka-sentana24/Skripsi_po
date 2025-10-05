@@ -16,6 +16,7 @@ class PasiensChart extends ChartWidget
             'day' => 'Per Hari',
             'week' => 'Per Minggu',
             'month' => 'Per Bulan',
+            'year' => 'Per Tahun',
         ];
     }
 
@@ -45,7 +46,7 @@ class PasiensChart extends ChartWidget
                 ->pluck('total', 'week');
 
             $labels = $pasien->keys()->map(fn($week) => "Minggu $week");
-        } else { // month
+        } elseif ($filter === 'month') {
             $pasien = Pasien::select(
                 DB::raw('COUNT(*) as total'),
                 DB::raw('MONTH(created_at) as month')
@@ -56,6 +57,16 @@ class PasiensChart extends ChartWidget
                 ->pluck('total', 'month');
 
             $labels = $pasien->keys()->map(fn($month) => date('F', mktime(0, 0, 0, $month, 1)));
+        } else { // year
+            $pasien = Pasien::select(
+                DB::raw('COUNT(*) as total'),
+                DB::raw('YEAR(created_at) as year')
+            )
+                ->groupBy('year')
+                ->orderBy('year')
+                ->pluck('total', 'year');
+
+            $labels = $pasien->keys()->map(fn($year) => (string) $year);
         }
 
         return [
@@ -63,7 +74,7 @@ class PasiensChart extends ChartWidget
                 [
                     'label' => 'Jumlah Pasien',
                     'data' => $pasien->values(),
-                    'borderColor' => '#16a34a', // hijau elegan
+                    'borderColor' => '#16a34a',
                     'backgroundColor' => 'rgba(22, 163, 74, 0.2)',
                     'tension' => 0.4,
                     'fill' => true,
@@ -111,7 +122,7 @@ class PasiensChart extends ChartWidget
                 'y' => [
                     'beginAtZero' => true,
                     'ticks' => [
-                        'stepSize' => 1, // angka bulat
+                        'stepSize' => 1,
                     ],
                     'title' => [
                         'display' => true,
@@ -125,6 +136,6 @@ class PasiensChart extends ChartWidget
 
     protected function getType(): string
     {
-        return 'line'; // ganti ke line chart
+        return 'line';
     }
 }

@@ -12,14 +12,12 @@ use Filament\Forms\Contracts\HasForms;
 use Filament\Pages\Page;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
-
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Blade;
 use Maatwebsite\Excel\Facades\Excel;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\WithHeadings;
-
-use Illuminate\Support\Collection;
 
 class Laporan extends Page implements HasForms
 {
@@ -27,6 +25,16 @@ class Laporan extends Page implements HasForms
 
     protected static ?string $navigationIcon = 'heroicon-o-document-text';
     protected static string $view = 'filament.pages.laporan';
+
+    public static function canViewAny(): bool
+    {
+        return auth()->check() && auth()->user()->role === 'eksekutif';
+    }
+
+    public static function shouldRegisterNavigation(): bool
+    {
+        return auth()->check() && auth()->user()->role === 'eksekutif';
+    }
 
     public static function getNavigationSort(): ?int
     {
@@ -40,6 +48,7 @@ class Laporan extends Page implements HasForms
     public Collection $reportData;
     public array $headers = [];
     public ?string $selectedReportTitle = null;
+    public array $summary = []; // <-- Tambahan untuk ringkasan laporan
 
     public function mount()
     {
@@ -107,6 +116,9 @@ class Laporan extends Page implements HasForms
         $this->headers = $this->reportData->isNotEmpty()
             ? array_map(fn($k) => ucwords(str_replace('_', ' ', $k)), array_keys((array) $this->reportData->first()))
             : [];
+
+        // Tambahkan ringkasan laporan
+        $this->generateSummary($reportType);
     }
 
     // ========================== QUERY ==========================
@@ -195,13 +207,46 @@ class Laporan extends Page implements HasForms
         return ['data' => $rows->toArray()];
     }
 
+    // ========================== SUMMARY ==========================
+
+    protected function generateSummary($reportType)
+    {
+        switch ($reportType) {
+            case 'penjualan_produk':
+                $this->summary = [
+                    'Total Produk Terjual' => $this->reportData->sum('jumlah'),
+                    'Total Pendapatan' => 'Rp ' . number_format($this->reportData->sum('subtotal'), 0, ',', '.'),
+                    'Jumlah Transaksi' => $this->reportData->count(),
+                ];
+                break;
+
+            case 'pembayaran_layanan':
+                $this->summary = [
+                    'Total Pembayaran' => 'Rp ' . number_format($this->reportData->sum('total_bayar'), 0, ',', '.'),
+                    'Jumlah Transaksi' => $this->reportData->count(),
+                ];
+                break;
+
+            case 'kunjungan_pasien':
+                $this->summary = [
+                    'Jumlah Pasien' => $this->reportData->count(),
+                    'Total Kunjungan' => $this->reportData->sum('jumlah_kunjungan'),
+                    'Rata-rata Kunjungan per Pasien' => number_format($this->reportData->avg('jumlah_kunjungan'), 2),
+                ];
+                break;
+
+            default:
+                $this->summary = [];
+        }
+    }
+
+    // ========================== EXPORT ==========================
+
     protected function getReportDataForExport(): Collection
     {
         $this->generateReport();
         return $this->reportData;
     }
-
-    // ========================== EXPORT ==========================
 
     public function exportToExcel()
     {
@@ -239,22 +284,22 @@ class Laporan extends Page implements HasForms
 
     public function exportToPdf()
     {
-        $reportData = $this->getReportDataForExport();
+        $reportData = $this->reportData;
         if ($reportData->isEmpty()) {
             $this->notify('error', 'Tidak ada data untuk diekspor.');
             return;
         }
 
-        $html = Blade::render('pdfs.laporan', [
+        $pdf = Pdf::loadView('pdf.laporan', [
             'reportTitle' => $this->selectedReportTitle,
-            'reportData' => $reportData,
             'headers' => $this->headers,
-        ]);
+            'reportData' => $reportData,
+            'summary' => $this->summary, // Tambahkan summary juga ke PDF
+        ])->setPaper('A4', 'portrait');
 
-        $pdf = Pdf::loadHtml($html);
-
-        return response()->streamDownload(function () use ($pdf) {
-            echo $pdf->stream();
-        }, $this->selectedReportTitle . '.pdf');
+        return response()->streamDownload(
+            fn() => print($pdf->output()),
+            $this->selectedReportTitle . '.pdf'
+        );
     }
 }

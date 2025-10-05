@@ -35,7 +35,7 @@ class TindakanResource extends Resource
 
     public static function canViewAny(): bool
     {
-        return auth()->check() && in_array(auth()->user()->role, ['terapis', 'admin', 'eksekutif']);
+        return auth()->check() && in_array(auth()->user()->role, ['terapis']);
     }
 
     public static function form(Form $form): Form
