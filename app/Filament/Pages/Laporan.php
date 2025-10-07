@@ -282,6 +282,28 @@ class Laporan extends Page implements HasForms
         return Excel::download($export, $this->selectedReportTitle . '.xlsx');
     }
 
+    // public function exportToPdf()
+    // {
+    //     $reportData = $this->reportData;
+    //     if ($reportData->isEmpty()) {
+    //         $this->notify('error', 'Tidak ada data untuk diekspor.');
+    //         return;
+    //     }
+
+    //     $pdf = Pdf::loadView('pdf.laporan', [
+    //         'reportTitle' => $this->selectedReportTitle,
+    //         'headers' => $this->headers,
+    //         'reportData' => $reportData,
+    //         'summary' => $this->summary, // Tambahkan summary juga ke PDF
+    //         'isPdf' => true,
+    //     ])->setPaper('A4', 'portrait');
+
+    //     return response()->streamDownload(
+    //         fn() => print($pdf->output()),
+    //         $this->selectedReportTitle . '.pdf'
+    //     );
+    // }
+
     public function exportToPdf()
     {
         $reportData = $this->reportData;
@@ -290,11 +312,19 @@ class Laporan extends Page implements HasForms
             return;
         }
 
-        $pdf = Pdf::loadView('pdf.laporan', [
+        // Ambil logo klinik dan ubah ke base64
+        $logoPath = public_path('images/logo-klinik.png'); // pastikan file ini ada di public/images
+        $logoBase64 = file_exists($logoPath)
+            ? 'data:image/png;base64,' . base64_encode(file_get_contents($logoPath))
+            : null;
+
+        // Generate PDF dengan view baru
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('pdf.laporan', [
             'reportTitle' => $this->selectedReportTitle,
             'headers' => $this->headers,
             'reportData' => $reportData,
-            'summary' => $this->summary, // Tambahkan summary juga ke PDF
+            'summary' => $this->summary,
+            'logoBase64' => $logoBase64,
         ])->setPaper('A4', 'portrait');
 
         return response()->streamDownload(
